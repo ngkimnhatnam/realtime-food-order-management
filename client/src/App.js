@@ -12,6 +12,9 @@ import notiSound from "./public/sounds/sound1.wav";
 import MenuTab from "./views/MenuTab/index";
 import DoingTab from "./views/OrderTab/index";
 
+// Config import
+import generalConfig from "../src/configs/index";
+
 const App = () => {
   const [menu, setMenu] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -25,7 +28,7 @@ const App = () => {
   const [play] = useSound(notiSound);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/v1/menus").then((menu) => {
+    axios.get(generalConfig.menu_api_endpoint).then((menu) => {
       setMenu(menu.data.data);
     });
   }, []);
@@ -61,7 +64,7 @@ const App = () => {
       sidenote: orderNote,
     };
 
-    const socket = io("http://localhost:8080");
+    const socket = io(generalConfig.server_address);
     socket.emit("send-order", newOrder);
     setOrderType("");
     setPendingOrder([]);
