@@ -3,7 +3,7 @@ import express from 'express';
 import loaders from './loaders/index';
 import httpServer from 'http';
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3001;
 
 const startServer = async () => {
   const application = express();
@@ -14,7 +14,7 @@ const startServer = async () => {
 
   const io = require('socket.io')(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: process.env.CLIENT_ADDRESS,
       methods: ['GET', 'POST'],
     },
   });
