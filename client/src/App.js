@@ -25,7 +25,7 @@ const App = () => {
   const [play] = useSound(notiSound);
 
   useEffect(() => {
-    axios.get("http://3.208.20.48:3001/api/v1/menus").then((menu) => {
+    axios.get("http://localhost:8080/api/v1/menus").then((menu) => {
       setMenu(menu.data.data);
     });
   }, []);
@@ -61,7 +61,7 @@ const App = () => {
       sidenote: orderNote,
     };
 
-    const socket = io("http://3.208.20.48:3001");
+    const socket = io("http://localhost:8080");
     socket.emit("send-order", newOrder);
     setOrderType("");
     setPendingOrder([]);

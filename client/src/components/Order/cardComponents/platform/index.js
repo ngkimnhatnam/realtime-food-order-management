@@ -1,7 +1,7 @@
 //Dependencies import
 import React from "react";
 
-const OrderPlatform = ({ type }) => {
+const OrderPlatform = ({ platform }) => {
   const woltStyle = {
     textAlign: "center",
     fontSize: "20px",
@@ -16,7 +16,9 @@ const OrderPlatform = ({ type }) => {
     backgroundColor: "#c1047b",
     borderRadius: "15px 15px 0px 0px",
   };
-  return <div style={type === "wolt" ? woltStyle : foodoraStyle}>{type}</div>;
+  return (
+    <div style={platform === "wolt" ? woltStyle : foodoraStyle}>{platform}</div>
+  );
 };
 
 export default OrderPlatform;
