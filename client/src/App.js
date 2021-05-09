@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { socket } from "./utils/socketio/index";
 import { io } from "socket.io-client";
+import useSound from "use-sound";
+
+// Assets import
+import notiSound from "./public/sounds/sound1.wav";
 
 // Views import
 import MenuTab from "./views/MenuTab/index";
@@ -18,11 +22,27 @@ const App = () => {
   const [orderId, setOrderId] = useState(1);
   const [orderNote, setOrderNote] = useState("");
 
+  const [play] = useSound(notiSound);
+
   useEffect(() => {
     axios.get("http://3.208.20.48:3001/api/v1/menus").then((menu) => {
       setMenu(menu.data.data);
     });
   }, []);
+
+  useEffect(() => {
+    socket.off("new-order").on("new-order", (order) => {
+      play();
+      setOrders(orders.concat(order));
+    });
+  }, [orders]);
+
+  useEffect(() => {
+    socket.off("delete-order").on("delete-order", (id) => {
+      const pendingOrderList = orders.filter((order) => order.id !== id);
+      setOrders(pendingOrderList);
+    });
+  }, [orders]);
 
   const removeFinishedOrder = (id) => {
     socket.emit("remove-order", id);
