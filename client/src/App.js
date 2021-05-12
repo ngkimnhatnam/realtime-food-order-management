@@ -4,6 +4,7 @@ import axios from "axios";
 import { socket } from "./utils/socketio/index";
 import { io } from "socket.io-client";
 import useSound from "use-sound";
+import Loader from "react-loader-spinner";
 
 // Assets import
 import notiSound from "./public/sounds/sound1.wav";
@@ -24,12 +25,14 @@ const App = () => {
   const [orderTime, setOrderTime] = useState("");
   const [orderId, setOrderId] = useState(1);
   const [orderNote, setOrderNote] = useState("");
+  const [loader, setLoader] = useState(true);
 
   const [play] = useSound(notiSound);
 
   useEffect(() => {
     axios.get(generalConfig.menu_api_endpoint).then((menu) => {
       setMenu(menu.data.data);
+      setLoader(false);
     });
   }, []);
 
@@ -55,23 +58,28 @@ const App = () => {
 
   const sendOrders = (event) => {
     event.preventDefault();
+    setLoader(true);
 
-    const newOrder = {
-      id: orderId,
-      dishes: pendingOrder,
-      time: orderTime,
-      type: orderType,
-      sidenote: orderNote,
-    };
+    setTimeout(() => {
+      const newOrder = {
+        id: orderId,
+        dishes: pendingOrder,
+        time: orderTime,
+        type: orderType,
+        sidenote: orderNote,
+      };
 
-    const socket = io(generalConfig.server_address);
-    socket.emit("send-order", newOrder);
-    setOrderType("");
-    setPendingOrder([]);
-    setOrderTime("");
-    setOrderNote("");
-    let newId = orderId + 1;
-    setOrderId(newId);
+      const socket = io(generalConfig.server_address);
+      socket.emit("send-order", newOrder);
+
+      setOrderType("");
+      setPendingOrder([]);
+      setOrderTime("");
+      setOrderNote("");
+      let newId = orderId + 1;
+      setOrderId(newId);
+      setLoader(false);
+    }, 500);
   };
 
   const addQuantity = (dishToAdd) => {
@@ -129,23 +137,41 @@ const App = () => {
     justifyContent: "space-between",
     textAlign: "center",
   };
+  const loaderStyle = {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+  };
 
   return (
-    <div style={style}>
-      <MenuTab
-        data={menu}
-        pendingOrder={pendingOrder}
-        orderTime={orderTime}
-        orderNote={orderNote}
-        chooseDeliveryPlatform={chooseDeliveryPlatform}
-        choosePredefinedOrderTime={choosePredefinedOrderTime}
-        chooseCustomOrderTime={chooseCustomOrderTime}
-        handleOrderNote={handleOrderNote}
-        reduceQuantity={reduceQuantity}
-        addQuantity={addQuantity}
-        sendOrders={sendOrders}
-      />
-      <DoingTab orders={orders} removeFinishedOrder={removeFinishedOrder} />
+    <div>
+      {loader ? (
+        <Loader
+          style={loaderStyle}
+          type="Audio"
+          color="#00BFFF"
+          height={150}
+          width={150}
+          visible={loader}
+        />
+      ) : (
+        <div style={style}>
+          <MenuTab
+            data={menu}
+            pendingOrder={pendingOrder}
+            orderTime={orderTime}
+            orderNote={orderNote}
+            chooseDeliveryPlatform={chooseDeliveryPlatform}
+            choosePredefinedOrderTime={choosePredefinedOrderTime}
+            chooseCustomOrderTime={chooseCustomOrderTime}
+            handleOrderNote={handleOrderNote}
+            reduceQuantity={reduceQuantity}
+            addQuantity={addQuantity}
+            sendOrders={sendOrders}
+          />
+          <DoingTab orders={orders} removeFinishedOrder={removeFinishedOrder} />
+        </div>
+      )}
     </div>
   );
 };
